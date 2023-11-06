@@ -1,20 +1,23 @@
 'use strict';
 var amqp = require('amqplib/callback_api');
-
-
-
+var jwt = require('jsonwebtoken');
 const express = require('express');
+const jwtMiddleware = require('./auth/authMiddleware');
+//load env
+require('dotenv').config()
 
 // Constants
-const PORT = 8081;
-const HOST = '0.0.0.0';
-const QUEUE_NAME = 'update_position';
+const PORT = process.env.PORT || 8080;
+const HOST = process.env.HOST || '0.0.0.0';
+const QUEUE_NAME = process.env.QUEUE || 'update_position';
 // amqp_url with username and password
 // Define the connection URL and the queue name
 const amqp_url = 'amqp://test:test@localhost:5672';
 // Declare global variables for the connection and the channel
 var connection = null;
 var channel = null;
+
+
 
 // Define a function that creates the connection and the channel
 function createConnectionAndChannel(callback) {
@@ -81,7 +84,6 @@ function createChannel(connection, callback) {
 
 
 
-
 // Define a function that sends a message to the queue using the channel
 function sendMessage(message) {
     // If the channel is not ready, wait until it is
@@ -98,6 +100,7 @@ function sendMessage(message) {
 
 // Define a function that receives a message from the queue using the channel
 function receiveMessage() {
+    //https://stackoverflow.com/questions/42567689/rabbitmq-precondition-failed-unknown-delivery-tag
     // If the channel is not ready, wait until it is
     if (!channel) {
         return createConnectionAndChannel(function () {
@@ -118,7 +121,7 @@ function receiveMessage() {
 }
 
 // Test the functions
-sendMessage('Hello World!');
+// sendMessage('Hello World!');
 // receiveMessage();
 
 
@@ -175,30 +178,27 @@ function sendDataByAmqp(data) {
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
-app.post('/update_position', (req, res) => {
-
+app.post('/update_position', jwtMiddleware, (req, res) => {
     //Get data from the request
     let requestReauest = req.body;
     // log body
-    console.log(requestReauest);
-    let id = requestReauest.id;
     let latitude = requestReauest.latitude;
     let longitude = requestReauest.longitude;
     //check for null values
-    if (id == null || latitude == null || longitude == null) {
+    if (latitude == null || longitude == null) {
         res.status(400).send('Bad Request');
     }
     //check for undefined values
-    if (id == undefined || latitude == undefined || longitude == undefined) {
+    if (latitude == undefined || longitude == undefined) {
         res.status(400).send('Bad Request');
     }
     //check for empty values
-    if (id == "" || latitude == "" || longitude == "") {
+    if (latitude == "" || longitude == "") {
         res.status(400).send('Bad Request');
     }
 
     let data = {
-        "id": req.body.id,
+        "id": req.user_id,
         "latitude": 12.123456,
         "longitude": 12.123456,
         "client": "nodejs",
