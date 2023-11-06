@@ -14,13 +14,11 @@ router.get('/', (req, res) => {
 })
 
 router.use('/:path(*)', jwtMiddleware, (req, res) => {
-    //the string path above could lierally be any string
-    // console.log(req.originalUrl);
-    // console.log(req.params.path);
+    //the string 'path' above could lierally be any string
     let resource = req.params.path;
     let params = req.query
     const url = `${process.env.NOMINATIM_SERVER_URL}/${resource}?${new URLSearchParams(params)}`;
-    console.log(`url: ${url}`)
+    // console.log(`url: ${url}`)
     axios.get(url)
         .then(response => {
             res.send(response.data);
