@@ -3,6 +3,7 @@ var amqp = require('amqplib/callback_api');
 var jwt = require('jsonwebtoken');
 const express = require('express');
 const jwtMiddleware = require('./auth/authMiddleware');
+const router = require('./nominatim/router');
 //load env
 require('dotenv').config()
 
@@ -206,7 +207,8 @@ app.post('/update_position', jwtMiddleware, (req, res) => {
     var sent = sendMessage(JSON.stringify(data));
     res.json(data);
 });
-
+app.use('/nominatim', router);
+//
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
 
