@@ -199,14 +199,24 @@ app.post('/update_position', jwtMiddleware, (req, res) => {
     }
 
     let data = {
-        "id": req.user_id,
-        "latitude": 12.123456,
-        "longitude": 12.123456,
+        // "id": req.user_id,
+        "id":generateRandomIntegers(1),
+        "latitude": generateRandomIntegers(2)+generateRandomIntegers(6),
+        "longitude": generateRandomIntegers(2)+generateRandomIntegers(6),
         "client": "nodejs",
     }
     var sent = sendMessage(JSON.stringify(data));
     res.json(data);
 });
+
+function generateRandomIntegers(n) {
+    let result = '';
+    for (let i = 0; i < n; i++) {
+        result += Math.floor(Math.random() * 9) + 1;
+    }
+    return result;
+}
+
 app.use('/nominatim', router);
 //
 app.listen(PORT, HOST);
