@@ -200,12 +200,12 @@ app.post('/update_position', jwtMiddleware, (req, res) => {
 
     let data = {
         // "id": req.user_id,
-        "id":generateRandomIntegers(1),
-        "latitude": generateRandomIntegers(2)+generateRandomIntegers(6),
-        "longitude": generateRandomIntegers(2)+generateRandomIntegers(6),
+        "id": generateRandomIntegers(1),
+        "latitude": generateRandomIntegers(2) + "." + generateRandomIntegers(6),
+        "longitude": generateRandomIntegers(2) + "." + generateRandomIntegers(6),
         "client": "nodejs",
     }
-    var sent = sendMessage(JSON.stringify(data));
+    // var sent = sendMessage(JSON.stringify(data));
     res.json(data);
 });
 
